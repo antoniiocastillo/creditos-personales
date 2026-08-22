@@ -1,0 +1,4 @@
+import Link from 'next/link';
+const links=[['/','▦','Dashboard'],['/clientes','♙','Clientes'],['/creditos','▤','Créditos'],['/pagos','◉','Pagos'],['/reportes','◫','Reportes'],['/administracion','⚙','Administración']];
+export function Shell({children}:{children:React.ReactNode}){return <div className="shell"><aside className="side"><div className="brand"><span className="logo">C</span>Crédito Fácil</div><nav className="nav">{links.map(([href,icon,label])=><Link key={href} href={href} className={href==='/'?'active':''}>{icon}&nbsp;&nbsp;{label}</Link>)}</nav><div className="side-foot">v1.0 · Gestión de créditos</div></aside><main className="page">{children}</main></div>}
+export function Top({title,subtitle}:{title:string;subtitle:string}){return <header className="top"><div><h1>{title}</h1><p>{subtitle}</p></div><div className="user"><span className="avatar">AM</span><span>Administrador<br/><small>Acceso completo</small></span></div></header>}
