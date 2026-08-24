@@ -147,7 +147,7 @@ export default async function CreditoDetalle({
                 <option value="custom">Personalizada (días)</option>
               </select>
             </label>
-            <label className="field">Días personalizados<input className="input" name="custom_days" type="number" min="1" defaultValue={loan.custom_days ?? ''} /></label>
+            <label className="field">Días personalizados<input className="input" name="custom_days" type="number" min="1" defaultValue={loan.custom_days || ''} /></label>
             <label className="field"># de parcialidades<input className="input" name="installments_count" type="number" min="1" defaultValue={loan.installments_count} required /></label>
             <label className="field">Tipo de interés
               <select name="interest_type" defaultValue={loan.interest_type} required>

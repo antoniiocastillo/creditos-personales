@@ -80,7 +80,7 @@ const loanSchema = z.object({
   disbursed_at: z.string().min(1),
   first_payment_at: z.string().min(1),
   frequency: z.enum(['weekly', 'biweekly', 'monthly', 'custom']),
-  custom_days: z.coerce.number().optional(),
+  custom_days: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.number().positive().optional()),
   installments_count: z.coerce.number().int().positive(),
   interest_type: z.enum(['simple', 'declining_balance']),
   annual_interest_rate: z.coerce.number().min(0),
