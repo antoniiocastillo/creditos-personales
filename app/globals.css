@@ -306,6 +306,25 @@ a.button { display: inline-flex; align-items: center; }
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+.password-field { position: relative; display: flex; }
+.password-field .input { width: 100%; padding-right: 38px; }
+.password-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  color: var(--muted);
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.password-toggle:hover { background: var(--bg); color: var(--ink); }
+
 .section-title { font-size: 19px; margin: 0 0 18px; font-weight: 700; }
 
 .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }

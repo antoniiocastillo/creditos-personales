@@ -1,4 +1,5 @@
 import { signIn } from '@/lib/actions';
+import { PasswordInput } from '@/components/password-input';
 
 export default function Login({ searchParams }: { searchParams: { error?: string } }) {
   return (
@@ -40,7 +41,7 @@ export default function Login({ searchParams }: { searchParams: { error?: string
           </label>
           <label className="field">
             Contraseña
-            <input className="input" name="password" type="password" required placeholder="••••••••" />
+            <PasswordInput name="password" placeholder="••••••••" required />
           </label>
           <button className="button" type="submit">Entrar</button>
         </form>
