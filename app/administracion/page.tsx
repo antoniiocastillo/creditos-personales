@@ -1,13 +1,18 @@
+import { Fragment } from 'react';
 import { Shell, Top } from '@/components/shell';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentProfile } from '@/lib/profile';
-import { updateSettingsAction, createUserAction, toggleUserActive } from '@/lib/actions';
+import { updateSettingsAction, createUserAction, toggleUserActive, changeUserPasswordAction } from '@/lib/actions';
 
 export const dynamic = 'force-dynamic';
 
 const roleLabel: Record<string, string> = { admin: 'Administrador', operator: 'Capturista' };
 
-export default async function Administracion({ searchParams }: { searchParams: { error?: string } }) {
+export default async function Administracion({
+  searchParams,
+}: {
+  searchParams: { error?: string; cambiar?: string; passwordChanged?: string };
+}) {
   const supabase = createClient();
   const profile = await getCurrentProfile();
   const isAdmin = profile?.role === 'admin';
@@ -21,6 +26,7 @@ export default async function Administracion({ searchParams }: { searchParams: {
     <Shell active="/administracion" userName={profile?.full_name} userRole={profile?.role}>
       <Top title="Administración" subtitle="Usuarios, permisos y configuración general" />
       {searchParams.error && <p style={{ color: 'var(--red)', fontSize: 13 }}>{searchParams.error}</p>}
+      {searchParams.passwordChanged && <p style={{ color: 'var(--green)', fontSize: 13 }}>Contraseña actualizada correctamente.</p>}
       {!isAdmin && <p className="small">Solo un administrador puede editar esta sección; la estás viendo en modo lectura.</p>}
 
       <div className="grid">
@@ -63,22 +69,38 @@ export default async function Administracion({ searchParams }: { searchParams: {
             <thead><tr><th>Usuario</th><th>Rol</th><th>Estado</th>{isAdmin && <th></th>}</tr></thead>
             <tbody>
               {users?.map((u) => (
-                <tr key={u.id}>
-                  <td><strong>{u.full_name}</strong></td>
-                  <td>{roleLabel[u.role]}</td>
-                  <td><span className={'badge ' + (u.active ? 'paid' : 'pending')}>{u.active ? 'Activo' : 'Inactivo'}</span></td>
-                  {isAdmin && (
-                    <td>
-                      <form action={toggleUserActive}>
-                        <input type="hidden" name="id" value={u.id} />
-                        <input type="hidden" name="active" value={String(u.active)} />
-                        <button className="link" type="submit" style={{ background: 'none', border: 0, cursor: 'pointer', font: 'inherit' }}>
-                          {u.active ? 'Desactivar' : 'Activar'}
-                        </button>
-                      </form>
-                    </td>
+                <Fragment key={u.id}>
+                  <tr>
+                    <td><strong>{u.full_name}</strong></td>
+                    <td>{roleLabel[u.role]}</td>
+                    <td><span className={'badge ' + (u.active ? 'paid' : 'pending')}>{u.active ? 'Activo' : 'Inactivo'}</span></td>
+                    {isAdmin && (
+                      <td style={{ display: 'flex', gap: 12 }}>
+                        <a className="link" href={searchParams.cambiar === u.id ? '/administracion' : `/administracion?cambiar=${u.id}`}>
+                          {searchParams.cambiar === u.id ? 'Cancelar' : 'Cambiar contraseña'}
+                        </a>
+                        <form action={toggleUserActive}>
+                          <input type="hidden" name="id" value={u.id} />
+                          <input type="hidden" name="active" value={String(u.active)} />
+                          <button className="link" type="submit" style={{ background: 'none', border: 0, cursor: 'pointer', font: 'inherit' }}>
+                            {u.active ? 'Desactivar' : 'Activar'}
+                          </button>
+                        </form>
+                      </td>
+                    )}
+                  </tr>
+                  {isAdmin && searchParams.cambiar === u.id && (
+                    <tr>
+                      <td colSpan={4} style={{ background: 'var(--bg)' }}>
+                        <form action={changeUserPasswordAction} className="filterbar" style={{ margin: '6px 0' }}>
+                          <input type="hidden" name="id" value={u.id} />
+                          <input className="input" name="password" type="password" minLength={8} placeholder={`Nueva contraseña para ${u.full_name}`} required autoFocus />
+                          <button className="button" type="submit">Guardar contraseña</button>
+                        </form>
+                      </td>
+                    </tr>
                   )}
-                </tr>
+                </Fragment>
               ))}
             </tbody>
           </table>

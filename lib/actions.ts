@@ -259,3 +259,21 @@ export async function toggleUserActive(formData: FormData) {
   await supabase.from('profiles').update({ active: !active }).eq('id', id);
   revalidatePath('/administracion');
 }
+
+const changePasswordSchema = z.object({
+  id: z.string().uuid(),
+  password: z.string().min(8),
+});
+
+export async function changeUserPasswordAction(formData: FormData) {
+  const profile = await getCurrentProfile();
+  if (profile?.role !== 'admin') fail('/administracion', 'Solo un administrador puede cambiar contraseñas');
+  const parsed = changePasswordSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) fail('/administracion', 'La contraseña debe tener al menos 8 caracteres');
+  const v = parsed.data!;
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.updateUserById(v.id, { password: v.password });
+  if (error) fail('/administracion', error.message);
+  revalidatePath('/administracion');
+  redirect('/administracion?passwordChanged=1');
+}
