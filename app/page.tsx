@@ -2,6 +2,7 @@ import { Shell, Top } from '@/components/shell';
 import { money } from '@/lib/money';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentProfile } from '@/lib/profile';
+import { IconCheck, IconInbox } from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,7 +75,11 @@ export default async function Dashboard() {
             <a className="link" href="/pagos">Ver todos</a>
           </div>
           {overdue.length === 0 ? (
-            <p className="empty">No hay pagos vencidos.</p>
+            <div className="empty">
+              <span className="empty-icon"><IconCheck size={22} /></span>
+              <strong>Sin pagos vencidos</strong>
+              <span>Tu cartera está al corriente por ahora.</span>
+            </div>
           ) : (
             <table className="table">
               <thead>
@@ -100,7 +105,11 @@ export default async function Dashboard() {
             <span className="link">14 días</span>
           </div>
           {upcoming.length === 0 ? (
-            <p className="empty">Sin vencimientos próximos.</p>
+            <div className="empty">
+              <span className="empty-icon"><IconInbox size={22} /></span>
+              <strong>Sin vencimientos próximos</strong>
+              <span>No hay parcialidades programadas en los próximos 14 días.</span>
+            </div>
           ) : (
             <div className="due">
               {upcoming.map((i: any) => (

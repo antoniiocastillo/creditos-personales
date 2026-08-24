@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getCurrentProfile } from '@/lib/profile';
 import { registerPaymentAction } from '@/lib/actions';
 import { money } from '@/lib/money';
+import { IconPayments, IconCheck, IconInbox, IconLoans } from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +13,7 @@ export default async function Pagos({ searchParams }: { searchParams: { nuevo?: 
   const supabase = createClient();
   const profile = await getCurrentProfile();
 
-  const [{ data: payments }, { data: loans }] = await Promise.all([
+  const [{ data: payments }, { data: loans }, { data: allAmounts }, { count: paymentsCount }] = await Promise.all([
     supabase
       .from('payments')
       .select('id,paid_at,amount,method,loans(folio),clients(full_name)')
@@ -23,11 +24,30 @@ export default async function Pagos({ searchParams }: { searchParams: { nuevo?: 
       .select('id,folio,clients(full_name)')
       .eq('status', 'active')
       .order('folio'),
+    supabase.from('payments').select('amount'),
+    supabase.from('payments').select('id', { count: 'exact', head: true }),
   ]);
+
+  const totalCollected = (allAmounts ?? []).reduce((s, p) => s + Number(p.amount), 0);
 
   return (
     <Shell active="/pagos">
       <Top title="Pagos" subtitle="Registra y consulta pagos de créditos" userName={profile?.full_name} userRole={profile?.role} />
+
+      <div className="stat-row">
+        <div className="stat-tile">
+          <span className="stat-icon"><IconPayments size={20} /></span>
+          <div><div className="stat-value">{paymentsCount ?? 0}</div><div className="stat-label">Pagos registrados</div></div>
+        </div>
+        <div className="stat-tile">
+          <span className="stat-icon"><IconCheck size={20} /></span>
+          <div><div className="stat-value">{money(totalCollected)}</div><div className="stat-label">Total cobrado</div></div>
+        </div>
+        <div className="stat-tile">
+          <span className="stat-icon"><IconLoans size={20} /></span>
+          <div><div className="stat-value">{loans?.length ?? 0}</div><div className="stat-label">Créditos activos por cobrar</div></div>
+        </div>
+      </div>
 
       {(searchParams.nuevo || searchParams.error) && (
         <div className="card" style={{ marginBottom: 20 }}>
@@ -65,7 +85,11 @@ export default async function Pagos({ searchParams }: { searchParams: { nuevo?: 
         </div>
         <p className="small">Al registrar un pago, el sistema aplica primero moratorios, después intereses y finalmente capital.</p>
         {!payments || payments.length === 0 ? (
-          <p className="empty">Sin pagos registrados todavía.</p>
+          <div className="empty">
+            <span className="empty-icon"><IconInbox size={24} /></span>
+            <strong>Sin pagos registrados</strong>
+            <span>Cuando registres un pago aquí se aplicará automáticamente a moratorios, interés y capital.</span>
+          </div>
         ) : (
           <table className="table">
             <thead>

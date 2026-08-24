@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getCurrentProfile } from '@/lib/profile';
 import { createLoanAction } from '@/lib/actions';
 import { money } from '@/lib/money';
+import { IconLoans, IconCheck, IconAlert, IconInbox } from '@/components/icons';
 
 const statusLabel: Record<string, string> = {
   draft: 'Borrador',
@@ -33,9 +34,28 @@ export default async function Creditos({ searchParams }: { searchParams: { nuevo
     supabase.from('clients').select('id,full_name').eq('active', true).order('full_name'),
   ]);
 
+  const activeLoans = loans?.filter((l) => l.status === 'active').length ?? 0;
+  const paidOff = loans?.filter((l) => l.status === 'paid_off').length ?? 0;
+  const placedTotal = (loans ?? []).reduce((s, l) => s + Number(l.principal), 0);
+
   return (
     <Shell active="/creditos">
       <Top title="Créditos" subtitle="Otorga y da seguimiento a los préstamos de tu cartera" userName={profile?.full_name} userRole={profile?.role} />
+
+      <div className="stat-row">
+        <div className="stat-tile">
+          <span className="stat-icon"><IconLoans size={20} /></span>
+          <div><div className="stat-value">{activeLoans}</div><div className="stat-label">Créditos activos</div></div>
+        </div>
+        <div className="stat-tile">
+          <span className="stat-icon"><IconCheck size={20} /></span>
+          <div><div className="stat-value">{paidOff}</div><div className="stat-label">Liquidados</div></div>
+        </div>
+        <div className="stat-tile">
+          <span className="stat-icon"><IconAlert size={20} /></span>
+          <div><div className="stat-value">{money(placedTotal)}</div><div className="stat-label">Cartera colocada</div></div>
+        </div>
+      </div>
 
       {(searchParams.nuevo || searchParams.error) && (
         <div className="card" style={{ marginBottom: 20 }}>
@@ -88,7 +108,11 @@ export default async function Creditos({ searchParams }: { searchParams: { nuevo
           <a className="button" href="/creditos?nuevo=1">+ Otorgar crédito</a>
         </div>
         {!loans || loans.length === 0 ? (
-          <p className="empty">Aún no hay créditos otorgados.</p>
+          <div className="empty">
+            <span className="empty-icon"><IconInbox size={24} /></span>
+            <strong>Aún no hay créditos otorgados</strong>
+            <span>Otorga tu primer crédito para generar la tabla de amortización y empezar a dar seguimiento.</span>
+          </div>
         ) : (
           <table className="table">
             <thead>

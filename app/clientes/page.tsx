@@ -2,6 +2,7 @@ import { Shell, Top } from '@/components/shell';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentProfile } from '@/lib/profile';
 import { createClientAction } from '@/lib/actions';
+import { IconClients, IconCheck, IconAlert, IconInbox } from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,10 +18,28 @@ export default async function Clientes({ searchParams }: { searchParams: { q?: s
     query = query.or(`full_name.ilike.%${searchParams.q}%,phone.ilike.%${searchParams.q}%,identification.ilike.%${searchParams.q}%`);
   }
   const { data: clients } = await query;
+  const total = clients?.length ?? 0;
+  const activeCount = clients?.filter((c) => c.active).length ?? 0;
+  const inactiveCount = total - activeCount;
 
   return (
     <Shell active="/clientes">
       <Top title="Clientes" subtitle="Consulta y administra la información de tus clientes" userName={profile?.full_name} userRole={profile?.role} />
+
+      <div className="stat-row">
+        <div className="stat-tile">
+          <span className="stat-icon"><IconClients size={20} /></span>
+          <div><div className="stat-value">{total}</div><div className="stat-label">Clientes totales</div></div>
+        </div>
+        <div className="stat-tile">
+          <span className="stat-icon"><IconCheck size={20} /></span>
+          <div><div className="stat-value">{activeCount}</div><div className="stat-label">Activos</div></div>
+        </div>
+        <div className="stat-tile">
+          <span className="stat-icon"><IconAlert size={20} /></span>
+          <div><div className="stat-value">{inactiveCount}</div><div className="stat-label">Inactivos</div></div>
+        </div>
+      </div>
 
       {(searchParams.nuevo || searchParams.error) && (
         <div className="card" style={{ marginBottom: 20 }}>
@@ -47,7 +66,11 @@ export default async function Clientes({ searchParams }: { searchParams: { q?: s
           <a className="button" href="/clientes?nuevo=1">+ Nuevo cliente</a>
         </div>
         {!clients || clients.length === 0 ? (
-          <p className="empty">Sin clientes registrados todavía.</p>
+          <div className="empty">
+            <span className="empty-icon"><IconInbox size={24} /></span>
+            <strong>Sin clientes registrados</strong>
+            <span>Da de alta a tu primer cliente para empezar a otorgar créditos y llevar su historial.</span>
+          </div>
         ) : (
           <table className="table">
             <thead>
