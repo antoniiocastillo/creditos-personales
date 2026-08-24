@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getCurrentProfile } from '@/lib/profile';
 import { money } from '@/lib/money';
 import { projectLateFee } from '@/lib/lateFees';
+import { updateLoanAction, cancelLoanAction } from '@/lib/actions';
 import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,13 @@ const lateRuleLabel: Record<string, string> = {
   daily: 'Por día de atraso',
   per_overdue_period: 'Por periodo vencido',
   percent_overdue_balance: '% sobre saldo vencido',
+};
+const loanStatusLabel: Record<string, string> = {
+  draft: 'Borrador',
+  active: 'Activo',
+  paid_off: 'Liquidado',
+  cancelled: 'Cancelado',
+  restructured: 'Reestructurado',
 };
 const statusLabel: Record<string, string> = {
   pending: 'Pendiente',
@@ -33,17 +41,19 @@ export default async function CreditoDetalle({
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { fecha?: string };
+  searchParams: { fecha?: string; editar?: string; error?: string };
 }) {
   const supabase = createClient();
   const profile = await getCurrentProfile();
   const today = new Date().toISOString().slice(0, 10);
   const targetDate = searchParams.fecha || today;
 
-  const [{ data: loan }, { data: installments }] = await Promise.all([
+  const [{ data: loan }, { data: installments }, { count: paymentsCount }, { data: clients }] = await Promise.all([
     supabase
       .from('loans')
-      .select('id,folio,principal,outstanding_balance,total_due,status,tolerance_days,late_rule,late_rate,clients(full_name,phone)')
+      .select(
+        'id,folio,client_id,principal,outstanding_balance,total_due,status,disbursed_at,first_payment_at,frequency,custom_days,installments_count,interest_type,annual_interest_rate,tolerance_days,late_rule,late_rate,clients(full_name,phone)',
+      )
       .eq('id', params.id)
       .single(),
     supabase
@@ -51,9 +61,14 @@ export default async function CreditoDetalle({
       .select('id,sequence_no,due_date,principal_due,ordinary_interest_due,late_interest_due,paid_amount,status')
       .eq('loan_id', params.id)
       .order('sequence_no', { ascending: true }),
+    supabase.from('payments').select('id', { count: 'exact', head: true }).eq('loan_id', params.id),
+    supabase.from('clients').select('id,full_name').eq('active', true).order('full_name'),
   ]);
 
   if (!loan) notFound();
+
+  const canEdit = (paymentsCount ?? 0) === 0 && (loan.status === 'active' || loan.status === 'draft');
+  const canCancel = loan.status !== 'cancelled' && loan.status !== 'paid_off';
 
   const rows = (installments ?? []).map((i: any) => {
     const settled = i.status === 'paid' || i.status === 'restructured';
@@ -86,8 +101,75 @@ export default async function CreditoDetalle({
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: -16, marginBottom: 20 }}>
         <Link className="link" href="/creditos">← Volver a créditos</Link>
-        <a className="button" href={`/creditos/${loan.id}/estado-cuenta`}>Descargar estado de cuenta (PDF)</a>
+        <div style={{ display: 'flex', gap: 10 }}>
+          {canEdit && (
+            <Link className="button" href={searchParams.editar ? `/creditos/${loan.id}` : `/creditos/${loan.id}?editar=1`} style={{ background: 'var(--ink-soft)' }}>
+              {searchParams.editar ? 'Cancelar edición' : 'Editar crédito'}
+            </Link>
+          )}
+          <a className="button" href={`/creditos/${loan.id}/estado-cuenta`}>Descargar estado de cuenta (PDF)</a>
+        </div>
       </div>
+
+      {searchParams.error && <p className="auth-error" style={{ display: 'inline-block', marginBottom: 16 }}>{searchParams.error}</p>}
+
+      {!canEdit && canCancel && (paymentsCount ?? 0) > 0 && (
+        <div className="card" style={{ marginBottom: 20 }}>
+          <p className="small" style={{ marginBottom: 12 }}>
+            Este crédito ya tiene {paymentsCount} pago{paymentsCount === 1 ? '' : 's'} registrado{paymentsCount === 1 ? '' : 's'}, así que ya no se puede editar
+            para no corromper el historial. Si se capturó mal, cancélalo y da de alta uno nuevo.
+          </p>
+          <form action={cancelLoanAction}>
+            <input type="hidden" name="id" value={loan.id} />
+            <button className="button" type="submit" style={{ background: 'var(--red)' }}>Cancelar este crédito</button>
+          </form>
+        </div>
+      )}
+
+      {canEdit && searchParams.editar && (
+        <div className="card" style={{ marginBottom: 20 }}>
+          <h2>Editar crédito</h2>
+          <form action={updateLoanAction} className="form-grid">
+            <input type="hidden" name="id" value={loan.id} />
+            <label className="field">Cliente
+              <select name="client_id" defaultValue={loan.client_id} required>
+                {clients?.map((c) => <option key={c.id} value={c.id}>{c.full_name}</option>)}
+              </select>
+            </label>
+            <label className="field">Monto del crédito<input className="input" name="principal" type="number" step="0.01" min="1" defaultValue={Number(loan.principal)} required /></label>
+            <label className="field">Fecha de dispersión<input className="input" name="disbursed_at" type="date" defaultValue={loan.disbursed_at} required /></label>
+            <label className="field">Primer pago<input className="input" name="first_payment_at" type="date" defaultValue={loan.first_payment_at} required /></label>
+            <label className="field">Frecuencia
+              <select name="frequency" defaultValue={loan.frequency} required>
+                <option value="weekly">Semanal</option>
+                <option value="biweekly">Quincenal</option>
+                <option value="monthly">Mensual</option>
+                <option value="custom">Personalizada (días)</option>
+              </select>
+            </label>
+            <label className="field">Días personalizados<input className="input" name="custom_days" type="number" min="1" defaultValue={loan.custom_days ?? ''} /></label>
+            <label className="field"># de parcialidades<input className="input" name="installments_count" type="number" min="1" defaultValue={loan.installments_count} required /></label>
+            <label className="field">Tipo de interés
+              <select name="interest_type" defaultValue={loan.interest_type} required>
+                <option value="simple">Simple</option>
+                <option value="declining_balance">Sobre saldo insoluto</option>
+              </select>
+            </label>
+            <label className="field">Tasa anual (%)<input className="input" name="annual_interest_rate" type="number" step="0.01" defaultValue={Number(loan.annual_interest_rate)} required /></label>
+            <label className="field">Días de tolerancia<input className="input" name="tolerance_days" type="number" defaultValue={loan.tolerance_days} /></label>
+            <label className="field">Regla de moratorios
+              <select name="late_rule" defaultValue={loan.late_rule}>
+                <option value="daily">Por día de atraso</option>
+                <option value="per_overdue_period">Por periodo vencido</option>
+                <option value="percent_overdue_balance">% sobre saldo vencido</option>
+              </select>
+            </label>
+            <label className="field">Tasa de moratorio<input className="input" name="late_rate" type="number" step="0.01" defaultValue={Number(loan.late_rate)} /></label>
+            <p className="small span2">Al guardar se recalcula la tabla de amortización completa con estos nuevos datos.</p>
+            <div className="span2"><button className="button" type="submit">Guardar cambios</button></div>
+          </form>
+        </div>
+      )}
 
       <div className="stat-row">
         <div className="stat-tile">
@@ -97,7 +179,7 @@ export default async function CreditoDetalle({
           <div><div className="stat-value">{money(Number(loan.outstanding_balance))}</div><div className="stat-label">Saldo pendiente (capital)</div></div>
         </div>
         <div className="stat-tile">
-          <div><div className="stat-value">{statusLabel[loan.status] ?? loan.status}</div><div className="stat-label">Estado</div></div>
+          <div><div className="stat-value">{loanStatusLabel[loan.status] ?? loan.status}</div><div className="stat-label">Estado</div></div>
         </div>
       </div>
 

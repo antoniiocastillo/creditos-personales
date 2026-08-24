@@ -154,6 +154,81 @@ export async function createLoanAction(formData: FormData) {
   redirect('/creditos');
 }
 
+export async function updateLoanAction(formData: FormData) {
+  const id = String(formData.get('id'));
+  const parsed = loanSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) fail(`/creditos/${id}`, 'Revisa los datos del crédito');
+  const v = parsed.data!;
+  const supabase = createClient();
+
+  const { count: paymentsCount } = await supabase.from('payments').select('id', { count: 'exact', head: true }).eq('loan_id', id);
+  if ((paymentsCount ?? 0) > 0) {
+    fail(`/creditos/${id}`, 'Este crédito ya tiene pagos registrados y no se puede editar. Cancélalo y captura uno nuevo si necesitas corregirlo.');
+  }
+
+  const schedule = createSchedule({
+    principal: v.principal,
+    annualRate: v.annual_interest_rate,
+    installments: v.installments_count,
+    firstPayment: v.first_payment_at,
+    frequency: v.frequency as Frequency,
+    customDays: v.custom_days,
+    type: v.interest_type === 'simple' ? 'simple' : 'declining',
+  });
+  const totalDue = schedule.reduce((sum, row) => sum + row.total, 0);
+
+  const { error: loanError } = await supabase
+    .from('loans')
+    .update({
+      client_id: v.client_id,
+      principal: v.principal,
+      disbursed_at: v.disbursed_at,
+      first_payment_at: v.first_payment_at,
+      frequency: v.frequency,
+      custom_days: v.custom_days ?? null,
+      installments_count: v.installments_count,
+      interest_type: v.interest_type,
+      annual_interest_rate: v.annual_interest_rate,
+      tolerance_days: v.tolerance_days,
+      late_rule: v.late_rule,
+      late_rate: v.late_rate,
+      total_due: +totalDue.toFixed(2),
+      outstanding_balance: v.principal,
+    })
+    .eq('id', id);
+  if (loanError) fail(`/creditos/${id}`, loanError.message);
+
+  const { error: delError } = await supabase.from('installments').delete().eq('loan_id', id);
+  if (delError) fail(`/creditos/${id}`, delError.message);
+
+  const installmentsRows = schedule.map((row) => ({
+    loan_id: id,
+    sequence_no: row.number,
+    due_date: row.dueDate,
+    principal_due: row.principal,
+    ordinary_interest_due: row.interest,
+    remaining_balance: row.balance,
+  }));
+  const { error: instError } = await supabase.from('installments').insert(installmentsRows);
+  if (instError) fail(`/creditos/${id}`, instError.message);
+
+  revalidatePath('/creditos');
+  revalidatePath(`/creditos/${id}`);
+  revalidatePath('/');
+  redirect(`/creditos/${id}`);
+}
+
+export async function cancelLoanAction(formData: FormData) {
+  const id = String(formData.get('id'));
+  const supabase = createClient();
+  const { error } = await supabase.from('loans').update({ status: 'cancelled' }).eq('id', id);
+  if (error) fail(`/creditos/${id}`, error.message);
+  revalidatePath('/creditos');
+  revalidatePath(`/creditos/${id}`);
+  revalidatePath('/');
+  redirect(`/creditos/${id}`);
+}
+
 // --- Pagos ---
 
 const paymentSchema = z.object({
