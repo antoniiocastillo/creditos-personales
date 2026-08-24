@@ -34,7 +34,7 @@ export default async function Creditos({ searchParams }: { searchParams: { nuevo
   ]);
 
   return (
-    <Shell>
+    <Shell active="/creditos">
       <Top title="Créditos" subtitle="Otorga y da seguimiento a los préstamos de tu cartera" userName={profile?.full_name} userRole={profile?.role} />
 
       {(searchParams.nuevo || searchParams.error) && (

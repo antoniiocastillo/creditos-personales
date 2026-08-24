@@ -19,7 +19,7 @@ export default async function Clientes({ searchParams }: { searchParams: { q?: s
   const { data: clients } = await query;
 
   return (
-    <Shell>
+    <Shell active="/clientes">
       <Top title="Clientes" subtitle="Consulta y administra la información de tus clientes" userName={profile?.full_name} userRole={profile?.role} />
 
       {(searchParams.nuevo || searchParams.error) && (

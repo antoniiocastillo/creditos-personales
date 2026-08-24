@@ -26,7 +26,7 @@ export default async function Pagos({ searchParams }: { searchParams: { nuevo?: 
   ]);
 
   return (
-    <Shell>
+    <Shell active="/pagos">
       <Top title="Pagos" subtitle="Registra y consulta pagos de créditos" userName={profile?.full_name} userRole={profile?.role} />
 
       {(searchParams.nuevo || searchParams.error) && (

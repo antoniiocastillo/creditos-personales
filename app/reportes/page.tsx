@@ -29,7 +29,7 @@ export default async function Reportes() {
   );
 
   return (
-    <Shell>
+    <Shell active="/reportes">
       <Top title="Reportes" subtitle="Información de cartera y cobranza" userName={profile?.full_name} userRole={profile?.role} />
       <div className="kpis">
         {[

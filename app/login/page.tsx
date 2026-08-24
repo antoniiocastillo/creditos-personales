@@ -2,25 +2,49 @@ import { signIn } from '@/lib/actions';
 
 export default function Login({ searchParams }: { searchParams: { error?: string } }) {
   return (
-    <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: 'var(--bg)' }}>
-      <form action={signIn} className="card" style={{ width: 360, display: 'grid', gap: 15 }}>
-        <div>
-          <h1 style={{ margin: '0 0 4px', fontSize: 20 }}>Crédito Fácil</h1>
-          <p className="small" style={{ margin: 0 }}>Inicia sesión para continuar</p>
+    <div className="auth-shell">
+      <section className="auth-brand">
+        <div className="auth-brand-mark">
+          <span className="logo">C</span>
+          Crédito Fácil
         </div>
-        {searchParams.error && (
-          <p style={{ color: 'var(--red)', fontSize: 13, margin: 0 }}>{searchParams.error}</p>
-        )}
-        <label className="field">
-          Correo
-          <input className="input" name="email" type="email" required autoFocus />
-        </label>
-        <label className="field">
-          Contraseña
-          <input className="input" name="password" type="password" required />
-        </label>
-        <button className="button" type="submit">Entrar</button>
-      </form>
+        <div className="auth-brand-copy">
+          <h2>Gestión de cartera crediticia, sin fricción.</h2>
+          <p>Administra clientes, créditos, cobranza y moratorios desde un solo lugar, con la seguridad y el control que tu operación necesita.</p>
+        </div>
+        <div className="auth-stats">
+          <div>
+            <strong>100%</strong>
+            <span>Trazabilidad de pagos</span>
+          </div>
+          <div>
+            <strong>RLS</strong>
+            <span>Seguridad a nivel de fila</span>
+          </div>
+          <div>
+            <strong>24/7</strong>
+            <span>Disponibilidad en la nube</span>
+          </div>
+        </div>
+      </section>
+      <section className="auth-panel">
+        <form action={signIn} className="auth-card">
+          <div>
+            <h1>Inicia sesión</h1>
+            <p className="small">Ingresa con tu correo y contraseña para continuar</p>
+          </div>
+          {searchParams.error && <p className="auth-error">{searchParams.error}</p>}
+          <label className="field">
+            Correo
+            <input className="input" name="email" type="email" required autoFocus placeholder="tu@empresa.com" />
+          </label>
+          <label className="field">
+            Contraseña
+            <input className="input" name="password" type="password" required placeholder="••••••••" />
+          </label>
+          <button className="button" type="submit">Entrar</button>
+        </form>
+      </section>
     </div>
   );
 }
