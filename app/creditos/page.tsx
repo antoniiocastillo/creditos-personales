@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Shell, Top } from '@/components/shell';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentProfile } from '@/lib/profile';
@@ -121,7 +122,7 @@ export default async function Creditos({ searchParams }: { searchParams: { nuevo
             <tbody>
               {loans.map((l: any) => (
                 <tr key={l.id}>
-                  <td><strong>{l.folio}</strong></td>
+                  <td><Link className="link" href={`/creditos/${l.id}`}><strong>{l.folio}</strong></Link></td>
                   <td>{l.clients?.full_name}</td>
                   <td>{money(Number(l.principal))}</td>
                   <td>{money(Number(l.outstanding_balance))}</td>
