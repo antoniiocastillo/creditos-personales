@@ -3,6 +3,8 @@ import { money } from '@/lib/money';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentProfile } from '@/lib/profile';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Dashboard() {
   const supabase = createClient();
   const profile = await getCurrentProfile();

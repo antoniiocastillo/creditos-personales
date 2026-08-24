@@ -11,6 +11,8 @@ const statusLabel: Record<string, string> = {
   cancelled: 'Cancelado',
   restructured: 'Reestructurado',
 };
+export const dynamic = 'force-dynamic';
+
 const statusBadge: Record<string, string> = {
   draft: 'pending',
   active: 'paid',

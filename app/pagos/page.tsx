@@ -4,6 +4,8 @@ import { getCurrentProfile } from '@/lib/profile';
 import { registerPaymentAction } from '@/lib/actions';
 import { money } from '@/lib/money';
 
+export const dynamic = 'force-dynamic';
+
 const methodLabel: Record<string, string> = { cash: 'Efectivo', transfer: 'Transferencia', card: 'Tarjeta', other: 'Otro' };
 
 export default async function Pagos({ searchParams }: { searchParams: { nuevo?: string; error?: string } }) {

@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { getCurrentProfile } from '@/lib/profile';
 import { createClientAction } from '@/lib/actions';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Clientes({ searchParams }: { searchParams: { q?: string; nuevo?: string; error?: string } }) {
   const supabase = createClient();
   const profile = await getCurrentProfile();

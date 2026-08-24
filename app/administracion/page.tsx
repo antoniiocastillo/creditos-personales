@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { getCurrentProfile } from '@/lib/profile';
 import { updateSettingsAction, createUserAction, toggleUserActive } from '@/lib/actions';
 
+export const dynamic = 'force-dynamic';
+
 const roleLabel: Record<string, string> = { admin: 'Administrador', operator: 'Capturista' };
 
 export default async function Administracion({ searchParams }: { searchParams: { error?: string } }) {
