@@ -22,7 +22,7 @@ export default async function Clientes({ searchParams }: { searchParams: { q?: s
     <Shell>
       <Top title="Clientes" subtitle="Consulta y administra la información de tus clientes" userName={profile?.full_name} userRole={profile?.role} />
 
-      {searchParams.nuevo && (
+      {(searchParams.nuevo || searchParams.error) && (
         <div className="card" style={{ marginBottom: 20 }}>
           <h2>Nuevo cliente</h2>
           {searchParams.error && <p style={{ color: 'var(--red)', fontSize: 13 }}>{searchParams.error}</p>}

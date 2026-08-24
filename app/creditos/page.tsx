@@ -37,7 +37,7 @@ export default async function Creditos({ searchParams }: { searchParams: { nuevo
     <Shell>
       <Top title="Créditos" subtitle="Otorga y da seguimiento a los préstamos de tu cartera" userName={profile?.full_name} userRole={profile?.role} />
 
-      {searchParams.nuevo && (
+      {(searchParams.nuevo || searchParams.error) && (
         <div className="card" style={{ marginBottom: 20 }}>
           <h2>Otorgar crédito</h2>
           {searchParams.error && <p style={{ color: 'var(--red)', fontSize: 13 }}>{searchParams.error}</p>}

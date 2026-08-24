@@ -29,7 +29,7 @@ export default async function Pagos({ searchParams }: { searchParams: { nuevo?: 
     <Shell>
       <Top title="Pagos" subtitle="Registra y consulta pagos de créditos" userName={profile?.full_name} userRole={profile?.role} />
 
-      {searchParams.nuevo && (
+      {(searchParams.nuevo || searchParams.error) && (
         <div className="card" style={{ marginBottom: 20 }}>
           <h2>Registrar pago</h2>
           {searchParams.error && <p style={{ color: 'var(--red)', fontSize: 13 }}>{searchParams.error}</p>}
