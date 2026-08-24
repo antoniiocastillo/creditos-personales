@@ -47,12 +47,10 @@ export default async function Dashboard() {
     new Date(d + 'T12:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
 
   return (
-    <Shell>
+    <Shell userName={profile?.full_name} userRole={profile?.role}>
       <Top
         title="Dashboard"
         subtitle={`Resumen de la cartera al ${new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}`}
-        userName={profile?.full_name}
-        userRole={profile?.role}
       />
       <section className="kpis">
         {[

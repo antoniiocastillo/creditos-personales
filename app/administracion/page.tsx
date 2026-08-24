@@ -18,8 +18,8 @@ export default async function Administracion({ searchParams }: { searchParams: {
   ]);
 
   return (
-    <Shell active="/administracion">
-      <Top title="Administración" subtitle="Usuarios, permisos y configuración general" userName={profile?.full_name} userRole={profile?.role} />
+    <Shell active="/administracion" userName={profile?.full_name} userRole={profile?.role}>
+      <Top title="Administración" subtitle="Usuarios, permisos y configuración general" />
       {searchParams.error && <p style={{ color: 'var(--red)', fontSize: 13 }}>{searchParams.error}</p>}
       {!isAdmin && <p className="small">Solo un administrador puede editar esta sección; la estás viendo en modo lectura.</p>}
 

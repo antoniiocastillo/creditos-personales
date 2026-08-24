@@ -23,8 +23,8 @@ export default async function Clientes({ searchParams }: { searchParams: { q?: s
   const inactiveCount = total - activeCount;
 
   return (
-    <Shell active="/clientes">
-      <Top title="Clientes" subtitle="Consulta y administra la información de tus clientes" userName={profile?.full_name} userRole={profile?.role} />
+    <Shell active="/clientes" userName={profile?.full_name} userRole={profile?.role}>
+      <Top title="Clientes" subtitle="Consulta y administra la información de tus clientes" />
 
       <div className="stat-row">
         <div className="stat-tile">

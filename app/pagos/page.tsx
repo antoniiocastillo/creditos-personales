@@ -31,8 +31,8 @@ export default async function Pagos({ searchParams }: { searchParams: { nuevo?: 
   const totalCollected = (allAmounts ?? []).reduce((s, p) => s + Number(p.amount), 0);
 
   return (
-    <Shell active="/pagos">
-      <Top title="Pagos" subtitle="Registra y consulta pagos de créditos" userName={profile?.full_name} userRole={profile?.role} />
+    <Shell active="/pagos" userName={profile?.full_name} userRole={profile?.role}>
+      <Top title="Pagos" subtitle="Registra y consulta pagos de créditos" />
 
       <div className="stat-row">
         <div className="stat-tile">

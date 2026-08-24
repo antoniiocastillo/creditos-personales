@@ -39,8 +39,8 @@ export default async function Creditos({ searchParams }: { searchParams: { nuevo
   const placedTotal = (loans ?? []).reduce((s, l) => s + Number(l.principal), 0);
 
   return (
-    <Shell active="/creditos">
-      <Top title="Créditos" subtitle="Otorga y da seguimiento a los préstamos de tu cartera" userName={profile?.full_name} userRole={profile?.role} />
+    <Shell active="/creditos" userName={profile?.full_name} userRole={profile?.role}>
+      <Top title="Créditos" subtitle="Otorga y da seguimiento a los préstamos de tu cartera" />
 
       <div className="stat-row">
         <div className="stat-tile">

@@ -38,3 +38,6 @@ export const IconAlert = ({ size = 18 }: IconProps) => (
 export const IconInbox = ({ size = 18 }: IconProps) => (
   <svg {...iconProps(size)}><path d="M3.5 12.5h5l1.6 2.5h3.8l1.6-2.5h5" /><path d="M5.2 6.5 3.5 12.5V18a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-5.5l-1.7-6a2 2 0 0 0-1.9-1.4H7.1a2 2 0 0 0-1.9 1.4Z" /></svg>
 );
+export const IconLogout = ({ size = 18 }: IconProps) => (
+  <svg {...iconProps(size)}><path d="M9 21H5.5A2.5 2.5 0 0 1 3 18.5v-13A2.5 2.5 0 0 1 5.5 3H9" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
+);
