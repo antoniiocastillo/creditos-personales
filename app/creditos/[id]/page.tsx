@@ -84,9 +84,10 @@ export default async function CreditoDetalle({
     <Shell active="/creditos" userName={profile?.full_name} userRole={profile?.role}>
       <Top title={`Crédito ${loan.folio}`} subtitle={(loan as any).clients?.full_name ?? ''} />
 
-      <p className="small" style={{ marginTop: -16, marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: -16, marginBottom: 20 }}>
         <Link className="link" href="/creditos">← Volver a créditos</Link>
-      </p>
+        <a className="button" href={`/creditos/${loan.id}/estado-cuenta`}>Descargar estado de cuenta (PDF)</a>
+      </div>
 
       <div className="stat-row">
         <div className="stat-tile">
