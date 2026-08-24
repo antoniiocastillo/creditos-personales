@@ -42,9 +42,9 @@ export function Shell({
         </div>
         <nav className="nav">
           {links.map(({ href, label, Icon }) => (
-            <Link key={href} href={href} className={href === active ? 'active' : ''}>
+            <Link key={href} href={href} className={href === active ? 'active' : ''} title={label} aria-label={label}>
               <Icon />
-              {label}
+              <span className="nav-label">{label}</span>
             </Link>
           ))}
         </nav>
