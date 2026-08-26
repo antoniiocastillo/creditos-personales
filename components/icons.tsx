@@ -47,3 +47,6 @@ export const IconEye = ({ size = 18 }: IconProps) => (
 export const IconEyeOff = ({ size = 18 }: IconProps) => (
   <svg {...iconProps(size)}><path d="M3 3l18 18" /><path d="M10.6 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a15.6 15.6 0 0 1-3.4 4.3M6.7 6.7C4 8.5 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 4.3-.9" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></svg>
 );
+export const IconBell = ({ size = 18 }: IconProps) => (
+  <svg {...iconProps(size)}><path d="M6 9a6 6 0 0 1 12 0c0 4.5 1.5 6 1.5 6h-15S6 13.5 6 9Z" /><path d="M10 19a2 2 0 0 0 4 0" /></svg>
+);
