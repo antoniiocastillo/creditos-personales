@@ -141,7 +141,7 @@ a { color: inherit; text-decoration: none; }
 }
 .icon-button:hover { background: var(--red-soft); color: var(--red); }
 
-.page { width: 100%; padding: 30px 36px; max-width: 1600px; margin: auto; }
+.page { width: 100%; padding: 30px 36px; max-width: 1600px; margin: 0 auto; }
 
 /* ---------- Notifications ---------- */
 
