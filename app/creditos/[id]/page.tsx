@@ -67,8 +67,8 @@ export default async function CreditoDetalle({
 
   if (!loan) notFound();
 
+  const hasBalance = Number(loan.outstanding_balance) > 0;
   const canEdit = (paymentsCount ?? 0) === 0 && (loan.status === 'active' || loan.status === 'draft');
-  const canCancel = loan.status !== 'cancelled' && loan.status !== 'paid_off';
 
   const rows = (installments ?? []).map((i: any) => {
     const settled = i.status === 'paid' || i.status === 'restructured';
@@ -113,16 +113,26 @@ export default async function CreditoDetalle({
 
       {searchParams.error && <p className="auth-error" style={{ display: 'inline-block', marginBottom: 16 }}>{searchParams.error}</p>}
 
-      {!canEdit && canCancel && (paymentsCount ?? 0) > 0 && (
+      {!canEdit && (loan.status === 'active' || loan.status === 'draft') && (paymentsCount ?? 0) > 0 && (
         <div className="card" style={{ marginBottom: 20 }}>
-          <p className="small" style={{ marginBottom: 12 }}>
-            Este crédito ya tiene {paymentsCount} pago{paymentsCount === 1 ? '' : 's'} registrado{paymentsCount === 1 ? '' : 's'}, así que ya no se puede editar
-            para no corromper el historial. Si se capturó mal, cancélalo y da de alta uno nuevo.
-          </p>
-          <form action={cancelLoanAction}>
-            <input type="hidden" name="id" value={loan.id} />
-            <button className="button" type="submit" style={{ background: 'var(--red)' }}>Cancelar este crédito</button>
-          </form>
+          {hasBalance ? (
+            <p className="small" style={{ margin: 0 }}>
+              Este crédito ya tiene {paymentsCount} pago{paymentsCount === 1 ? '' : 's'} registrado{paymentsCount === 1 ? '' : 's'} y todavía debe{' '}
+              <strong>{money(Number(loan.outstanding_balance))}</strong> de saldo, así que no se puede editar ni cancelar — cancelarlo con saldo pendiente
+              haría que el sistema deje de darle seguimiento a esa deuda real. Sigue registrando sus pagos normalmente hasta liquidarlo.
+            </p>
+          ) : (
+            <>
+              <p className="small" style={{ marginBottom: 12 }}>
+                Este crédito ya tiene {paymentsCount} pago{paymentsCount === 1 ? '' : 's'} registrado{paymentsCount === 1 ? '' : 's'}, así que ya no se puede
+                editar para no corromper el historial. Ya no tiene saldo pendiente, así que si necesitas darlo de baja puedes cancelarlo.
+              </p>
+              <form action={cancelLoanAction}>
+                <input type="hidden" name="id" value={loan.id} />
+                <button className="button" type="submit" style={{ background: 'var(--red)' }}>Cancelar este crédito</button>
+              </form>
+            </>
+          )}
         </div>
       )}
 

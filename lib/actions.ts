@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createSchedule, type Frequency } from '@/lib/amortization';
 import { getCurrentProfile } from '@/lib/profile';
+import { money } from '@/lib/money';
 
 function fail(path: string, message: string): never {
   redirect(`${path}?error=${encodeURIComponent(message)}`);
@@ -221,6 +222,16 @@ export async function updateLoanAction(formData: FormData) {
 export async function cancelLoanAction(formData: FormData) {
   const id = String(formData.get('id'));
   const supabase = createClient();
+
+  const { data: loan } = await supabase.from('loans').select('outstanding_balance').eq('id', id).single();
+  if (!loan) fail(`/creditos/${id}`, 'Crédito no encontrado');
+  if (Number(loan.outstanding_balance) > 0) {
+    fail(
+      `/creditos/${id}`,
+      `No se puede cancelar: todavía tiene ${money(Number(loan.outstanding_balance))} de saldo pendiente. Registra los pagos que faltan hasta dejarlo en $0 antes de cancelarlo.`,
+    );
+  }
+
   const { error } = await supabase.from('loans').update({ status: 'cancelled' }).eq('id', id);
   if (error) fail(`/creditos/${id}`, error.message);
   revalidatePath('/creditos');
