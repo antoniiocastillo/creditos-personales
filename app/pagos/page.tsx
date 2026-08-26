@@ -4,6 +4,7 @@ import { getCurrentProfile } from '@/lib/profile';
 import { registerPaymentAction } from '@/lib/actions';
 import { money } from '@/lib/money';
 import { IconPayments, IconCheck, IconInbox, IconLoans } from '@/components/icons';
+import { PaymentLoanPicker, type LoanOption } from '@/components/payment-loan-picker';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +14,7 @@ export default async function Pagos({ searchParams }: { searchParams: { nuevo?: 
   const supabase = createClient();
   const profile = await getCurrentProfile();
 
-  const [{ data: payments }, { data: loans }, { data: allAmounts }, { count: paymentsCount }] = await Promise.all([
+  const [{ data: payments }, { data: loans }, { data: pendingInstallments }, { data: allAmounts }, { count: paymentsCount }] = await Promise.all([
     supabase
       .from('payments')
       .select('id,paid_at,amount,method,loans(folio),clients(full_name)')
@@ -21,14 +22,38 @@ export default async function Pagos({ searchParams }: { searchParams: { nuevo?: 
       .limit(20),
     supabase
       .from('loans')
-      .select('id,folio,clients(full_name)')
+      .select('id,folio,outstanding_balance,clients(full_name)')
       .eq('status', 'active')
       .order('folio'),
+    supabase
+      .from('installments')
+      .select('loan_id,due_date,principal_due,ordinary_interest_due,late_interest_due,paid_amount')
+      .not('status', 'in', '(paid,restructured)')
+      .order('due_date', { ascending: true }),
     supabase.from('payments').select('amount'),
     supabase.from('payments').select('id', { count: 'exact', head: true }),
   ]);
 
   const totalCollected = (allAmounts ?? []).reduce((s, p) => s + Number(p.amount), 0);
+
+  const nextInstallmentByLoan = new Map<string, any>();
+  for (const i of pendingInstallments ?? []) {
+    if (!nextInstallmentByLoan.has(i.loan_id)) nextInstallmentByLoan.set(i.loan_id, i);
+  }
+
+  const loanOptions: LoanOption[] = (loans ?? []).map((l: any) => {
+    const next = nextInstallmentByLoan.get(l.id);
+    return {
+      id: l.id,
+      folio: l.folio,
+      clientName: l.clients?.full_name ?? '',
+      outstandingBalance: Number(l.outstanding_balance),
+      nextDueDate: next?.due_date ?? null,
+      nextAmount: next
+        ? Number(next.principal_due) + Number(next.ordinary_interest_due) + Number(next.late_interest_due) - Number(next.paid_amount)
+        : null,
+    };
+  });
 
   return (
     <Shell active="/pagos" userName={profile?.full_name} userRole={profile?.role}>
@@ -54,14 +79,7 @@ export default async function Pagos({ searchParams }: { searchParams: { nuevo?: 
           <h2>Registrar pago</h2>
           {searchParams.error && <p style={{ color: 'var(--red)', fontSize: 13 }}>{searchParams.error}</p>}
           <form action={registerPaymentAction} className="form-grid">
-            <label className="field">Crédito
-              <select name="loan_id" required>
-                <option value="">Selecciona un crédito</option>
-                {loans?.map((l: any) => (
-                  <option key={l.id} value={l.id}>{l.folio} · {l.clients?.full_name}</option>
-                ))}
-              </select>
-            </label>
+            <PaymentLoanPicker loans={loanOptions} />
             <label className="field">Monto<input className="input" name="amount" type="number" step="0.01" min="0.01" required /></label>
             <label className="field">Método
               <select name="method" required>
