@@ -31,7 +31,7 @@ export function NotificationsBell({ items, totalCount }: { items: OverdueItem[];
     <div className="notif" ref={ref}>
       <button type="button" className="notif-button" onClick={() => setOpen((v) => !v)} aria-label="Notificaciones">
         <IconBell size={19} />
-        {totalCount > 0 && <span className="notif-badge">{totalCount > 9 ? '9+' : totalCount}</span>}
+        {totalCount > 0 && <span className="notif-badge" />}
       </button>
       {open && (
         <div className="notif-dropdown">

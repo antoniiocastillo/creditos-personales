@@ -43,7 +43,7 @@ async function getOverdueNotifications(): Promise<{ items: OverdueItem[]; totalC
   return { items, totalCount: count ?? 0 };
 }
 
-export async function Shell({
+export function Shell({
   children,
   active = '/',
   userName,
@@ -62,20 +62,15 @@ export async function Shell({
     .join('')
     .toUpperCase();
 
-  const { items, totalCount } = await getOverdueNotifications();
-
   return (
     <div className="shell">
       <aside className="side">
-        <div className="side-top">
-          <div className="brand">
-            <span className="logo">C</span>
-            <div>
-              <div className="brand-name">Crédito Fácil</div>
-              <div className="brand-sub">Gestión de créditos</div>
-            </div>
+        <div className="brand">
+          <span className="logo">C</span>
+          <div>
+            <div className="brand-name">Crédito Fácil</div>
+            <div className="brand-sub">Gestión de créditos</div>
           </div>
-          <NotificationsBell items={items} totalCount={totalCount} />
         </div>
         <nav className="nav">
           {links.map(({ href, label, Icon }) => (
@@ -103,13 +98,15 @@ export async function Shell({
   );
 }
 
-export function Top({ title, subtitle }: { title: string; subtitle: string }) {
+export async function Top({ title, subtitle }: { title: string; subtitle: string }) {
+  const { items, totalCount } = await getOverdueNotifications();
   return (
     <header className="top">
       <div>
         <h1>{title}</h1>
         <p>{subtitle}</p>
       </div>
+      <NotificationsBell items={items} totalCount={totalCount} />
     </header>
   );
 }
