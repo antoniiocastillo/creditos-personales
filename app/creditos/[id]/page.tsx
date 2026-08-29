@@ -155,12 +155,6 @@ export default async function CreditoDetalle({
             <FrequencyAndRateFields defaultFrequency={loan.frequency} defaultRate={Number(loan.annual_interest_rate)} />
             <label className="field">Días personalizados<input className="input" name="custom_days" type="number" min="1" defaultValue={loan.custom_days || ''} /></label>
             <label className="field"># de parcialidades<input className="input" name="installments_count" type="number" min="1" defaultValue={loan.installments_count} required /></label>
-            <label className="field">Tipo de interés
-              <select name="interest_type" defaultValue={loan.interest_type} required>
-                <option value="simple">Simple</option>
-                <option value="declining_balance">Sobre saldo insoluto</option>
-              </select>
-            </label>
             <label className="field">Días de tolerancia<input className="input" name="tolerance_days" type="number" defaultValue={loan.tolerance_days} /></label>
             <label className="field">Regla de moratorios
               <select name="late_rule" defaultValue={loan.late_rule}>

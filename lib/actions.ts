@@ -84,7 +84,6 @@ const loanSchema = z.object({
   frequency: z.enum(['weekly', 'biweekly', 'monthly', 'custom']),
   custom_days: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.number().positive().optional()),
   installments_count: z.coerce.number().int().positive(),
-  interest_type: z.enum(['simple', 'declining_balance']),
   annual_interest_rate: z.coerce.number().min(0),
   tolerance_days: z.coerce.number().int().min(0).default(3),
   late_rule: z.enum(['daily', 'per_overdue_period', 'percent_overdue_balance']),
@@ -115,7 +114,7 @@ export async function createLoanAction(formData: FormData) {
     firstPayment: v.first_payment_at,
     frequency: v.frequency as Frequency,
     customDays: v.custom_days,
-    type: v.interest_type === 'simple' ? 'simple' : 'declining',
+    type: 'simple',
   });
   const totalDue = schedule.reduce((sum, row) => sum + row.total, 0);
 
@@ -130,7 +129,7 @@ export async function createLoanAction(formData: FormData) {
       frequency: v.frequency,
       custom_days: v.custom_days ?? null,
       installments_count: v.installments_count,
-      interest_type: v.interest_type,
+      interest_type: 'simple',
       annual_interest_rate: effectiveRate,
       tolerance_days: v.tolerance_days,
       late_rule: v.late_rule,
@@ -183,7 +182,7 @@ export async function updateLoanAction(formData: FormData) {
     firstPayment: v.first_payment_at,
     frequency: v.frequency as Frequency,
     customDays: v.custom_days,
-    type: v.interest_type === 'simple' ? 'simple' : 'declining',
+    type: 'simple',
   });
   const totalDue = schedule.reduce((sum, row) => sum + row.total, 0);
 
@@ -197,7 +196,7 @@ export async function updateLoanAction(formData: FormData) {
       frequency: v.frequency,
       custom_days: v.custom_days ?? null,
       installments_count: v.installments_count,
-      interest_type: v.interest_type,
+      interest_type: 'simple',
       annual_interest_rate: effectiveRate,
       tolerance_days: v.tolerance_days,
       late_rule: v.late_rule,
