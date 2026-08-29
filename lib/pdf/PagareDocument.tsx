@@ -37,7 +37,6 @@ const styles = StyleSheet.create({
   tRow: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: LINE },
   tCell: { fontSize: 9.5, padding: 6 },
 
-  legal: { fontSize: 8.5, color: MUTED, textAlign: 'justify', marginTop: 6, marginBottom: 30 },
 
   signatures: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 40 },
   sigBlock: { width: '42%', alignItems: 'center' },
@@ -146,11 +145,6 @@ export function PagareDocument({
             mismo que quedará en poder del acreedor hasta la total liquidación de este pagaré.
           </Text>
         )}
-
-        <Text style={styles.legal}>
-          Este documento es un pagaré en los términos de los artículos 170 y 174 de la Ley General de Títulos y Operaciones de Crédito. Lugar
-          de pago: el señalado en este documento. No sujeto a protesto.
-        </Text>
 
         <View style={styles.signatures}>
           <View style={styles.sigBlock}>
