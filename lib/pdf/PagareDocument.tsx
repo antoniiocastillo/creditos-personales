@@ -19,8 +19,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
+  amountLabel: { fontSize: 8, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 },
   amountNumber: { fontSize: 20, fontFamily: 'Helvetica-Bold', color: INDIGO, marginBottom: 4 },
   amountWords: { fontSize: 10, fontFamily: 'Helvetica-Bold' },
+  amountBreakdown: { fontSize: 8.5, color: MUTED, marginTop: 6 },
 
   placeDate: { textAlign: 'right', marginBottom: 18, fontSize: 10 },
 
@@ -97,18 +99,23 @@ export function PagareDocument({
         <Text style={styles.folio}>{companyName} · Folio {loan.folio}</Text>
 
         <View style={styles.amountBox}>
+          <Text style={styles.amountLabel}>Total a pagar (capital + interés)</Text>
           <Text style={styles.amountNumber}>{money(loan.total_due)}</Text>
           <Text style={styles.amountWords}>{moneyInWords(loan.total_due)}</Text>
+          <Text style={styles.amountBreakdown}>
+            Capital recibido en efectivo: {money(loan.principal)} · Interés total: {money(loan.total_due - loan.principal)}
+          </Text>
         </View>
 
         <Text style={styles.placeDate}>Delicias, Chihuahua, a {fmtDate(today)}</Text>
 
         <Text style={styles.paragraph}>
-          Debo y pagaré incondicionalmente a la orden de <Text style={styles.bold}>{companyName}</Text> la cantidad de{' '}
-          <Text style={styles.bold}>{money(loan.total_due)}</Text> ({moneyInWords(loan.total_due)}), valor que reconozco haber recibido a mi
-          entera satisfacción en calidad de préstamo por {money(loan.principal)}, mismo que me comprometo a liquidar mediante los pagos
-          parciales que se detallan en el siguiente plan de pagos, sin que dichos abonos parciales modifiquen el carácter único e indivisible de
-          este pagaré.
+          Reconozco haber recibido en este acto, en efectivo y a mi entera satisfacción, la cantidad de{' '}
+          <Text style={styles.bold}>{money(loan.principal)}</Text> ({moneyInWords(loan.principal)}) en calidad de préstamo. En consecuencia,
+          debo y pagaré incondicionalmente a la orden de <Text style={styles.bold}>{companyName}</Text> la cantidad total de{' '}
+          <Text style={styles.bold}>{money(loan.total_due)}</Text> ({moneyInWords(loan.total_due)}) — que corresponde al capital recibido más
+          los intereses pactados — mediante los pagos parciales que se detallan en el siguiente plan de pagos, sin que dichos abonos parciales
+          modifiquen el carácter único e indivisible de este pagaré.
         </Text>
 
         <Text style={styles.sectionTitle}>Plan de pagos</Text>
