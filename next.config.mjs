@@ -4,6 +4,7 @@ const nextConfig = {
     typedRoutes: false,
     outputFileTracingIncludes: {
       '/creditos/[id]/estado-cuenta': ['./node_modules/pdfkit/**/*', './node_modules/fontkit/**/*', './node_modules/@react-pdf/**/*'],
+      '/creditos/[id]/pagare': ['./node_modules/pdfkit/**/*', './node_modules/fontkit/**/*', './node_modules/@react-pdf/**/*'],
     },
   },
 };

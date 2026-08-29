@@ -108,6 +108,7 @@ export default async function CreditoDetalle({
               {searchParams.editar ? 'Cancelar edición' : 'Editar crédito'}
             </Link>
           )}
+          <a className="button" href={`/creditos/${loan.id}/pagare`} style={{ background: 'var(--ink-soft)' }}>Descargar pagaré (PDF)</a>
           <a className="button" href={`/creditos/${loan.id}/estado-cuenta`}>Descargar estado de cuenta (PDF)</a>
         </div>
       </div>
