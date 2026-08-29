@@ -5,6 +5,7 @@ import { getCurrentProfile } from '@/lib/profile';
 import { money } from '@/lib/money';
 import { projectLateFee } from '@/lib/lateFees';
 import { updateLoanAction, cancelLoanAction } from '@/lib/actions';
+import { FrequencyAndRateFields } from '@/components/frequency-rate-fields';
 import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -149,14 +150,7 @@ export default async function CreditoDetalle({
             <label className="field">Monto del crédito<input className="input" name="principal" type="number" step="0.01" min="1" defaultValue={Number(loan.principal)} required /></label>
             <label className="field">Fecha de dispersión<input className="input" name="disbursed_at" type="date" defaultValue={loan.disbursed_at} required /></label>
             <label className="field">Primer pago<input className="input" name="first_payment_at" type="date" defaultValue={loan.first_payment_at} required /></label>
-            <label className="field">Frecuencia
-              <select name="frequency" defaultValue={loan.frequency} required>
-                <option value="weekly">Semanal</option>
-                <option value="biweekly">Quincenal</option>
-                <option value="monthly">Mensual</option>
-                <option value="custom">Personalizada (días)</option>
-              </select>
-            </label>
+            <FrequencyAndRateFields defaultFrequency={loan.frequency} defaultRate={Number(loan.annual_interest_rate)} />
             <label className="field">Días personalizados<input className="input" name="custom_days" type="number" min="1" defaultValue={loan.custom_days || ''} /></label>
             <label className="field"># de parcialidades<input className="input" name="installments_count" type="number" min="1" defaultValue={loan.installments_count} required /></label>
             <label className="field">Tipo de interés
@@ -165,7 +159,6 @@ export default async function CreditoDetalle({
                 <option value="declining_balance">Sobre saldo insoluto</option>
               </select>
             </label>
-            <label className="field">Tasa anual (%)<input className="input" name="annual_interest_rate" type="number" step="0.01" defaultValue={Number(loan.annual_interest_rate)} required /></label>
             <label className="field">Días de tolerancia<input className="input" name="tolerance_days" type="number" defaultValue={loan.tolerance_days} /></label>
             <label className="field">Regla de moratorios
               <select name="late_rule" defaultValue={loan.late_rule}>

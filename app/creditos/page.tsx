@@ -5,6 +5,7 @@ import { getCurrentProfile } from '@/lib/profile';
 import { createLoanAction } from '@/lib/actions';
 import { money } from '@/lib/money';
 import { IconLoans, IconCheck, IconAlert, IconInbox } from '@/components/icons';
+import { FrequencyAndRateFields } from '@/components/frequency-rate-fields';
 
 const statusLabel: Record<string, string> = {
   draft: 'Borrador',
@@ -72,14 +73,7 @@ export default async function Creditos({ searchParams }: { searchParams: { nuevo
             <label className="field">Monto del crédito<input className="input" name="principal" type="number" step="0.01" min="1" required /></label>
             <label className="field">Fecha de dispersión<input className="input" name="disbursed_at" type="date" required /></label>
             <label className="field">Primer pago<input className="input" name="first_payment_at" type="date" required /></label>
-            <label className="field">Frecuencia
-              <select name="frequency" required>
-                <option value="weekly">Semanal</option>
-                <option value="biweekly">Quincenal</option>
-                <option value="monthly">Mensual</option>
-                <option value="custom">Personalizada (días)</option>
-              </select>
-            </label>
+            <FrequencyAndRateFields />
             <label className="field">Días personalizados<input className="input" name="custom_days" type="number" min="1" /></label>
             <label className="field"># de parcialidades<input className="input" name="installments_count" type="number" min="1" required /></label>
             <label className="field">Tipo de interés
@@ -88,7 +82,6 @@ export default async function Creditos({ searchParams }: { searchParams: { nuevo
                 <option value="declining_balance">Sobre saldo insoluto</option>
               </select>
             </label>
-            <label className="field">Tasa anual (%)<input className="input" name="annual_interest_rate" type="number" step="0.01" defaultValue={36} required /></label>
             <label className="field">Días de tolerancia<input className="input" name="tolerance_days" type="number" defaultValue={3} /></label>
             <label className="field">Regla de moratorios
               <select name="late_rule">

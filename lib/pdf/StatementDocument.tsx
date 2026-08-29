@@ -170,7 +170,7 @@ export function StatementDocument({
             <Text style={styles.infoBoxTitle}>Crédito</Text>
             <View style={styles.infoLine}><Text style={styles.infoLabel}>Estado</Text><Text style={styles.infoValue}>{loanStatusLabel[loan.status] ?? loan.status}</Text></View>
             <View style={styles.infoLine}><Text style={styles.infoLabel}>Monto original</Text><Text style={styles.infoValue}>{money(loan.principal)}</Text></View>
-            <View style={styles.infoLine}><Text style={styles.infoLabel}>Tasa anual</Text><Text style={styles.infoValue}>{loan.annual_interest_rate}%</Text></View>
+            <View style={styles.infoLine}><Text style={styles.infoLabel}>Tasa de interés</Text><Text style={styles.infoValue}>{loan.annual_interest_rate}%</Text></View>
             <View style={styles.infoLine}><Text style={styles.infoLabel}>Dispersión</Text><Text style={styles.infoValue}>{fmtDate(loan.disbursed_at)}</Text></View>
             <View style={styles.infoLine}><Text style={styles.infoLabel}>Parcialidades</Text><Text style={styles.infoValue}>{loan.installments_count}</Text></View>
           </View>

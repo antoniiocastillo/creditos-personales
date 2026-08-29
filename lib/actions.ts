@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createSchedule, type Frequency } from '@/lib/amortization';
 import { getCurrentProfile } from '@/lib/profile';
 import { money } from '@/lib/money';
+import { fixedRateFor } from '@/lib/interestRates';
 
 function fail(path: string, message: string): never {
   redirect(`${path}?error=${encodeURIComponent(message)}`);
@@ -103,9 +104,11 @@ export async function createLoanAction(formData: FormData) {
   if (folioError) fail('/creditos', folioError.message);
   const folio = folioData as string;
 
+  const effectiveRate = fixedRateFor(v.frequency) ?? v.annual_interest_rate;
+
   const schedule = createSchedule({
     principal: v.principal,
-    annualRate: v.annual_interest_rate,
+    rate: effectiveRate,
     installments: v.installments_count,
     firstPayment: v.first_payment_at,
     frequency: v.frequency as Frequency,
@@ -126,7 +129,7 @@ export async function createLoanAction(formData: FormData) {
       custom_days: v.custom_days ?? null,
       installments_count: v.installments_count,
       interest_type: v.interest_type,
-      annual_interest_rate: v.annual_interest_rate,
+      annual_interest_rate: effectiveRate,
       tolerance_days: v.tolerance_days,
       late_rule: v.late_rule,
       late_rate: v.late_rate,
@@ -167,9 +170,11 @@ export async function updateLoanAction(formData: FormData) {
     fail(`/creditos/${id}`, 'Este crédito ya tiene pagos registrados y no se puede editar. Cancélalo y captura uno nuevo si necesitas corregirlo.');
   }
 
+  const effectiveRate = fixedRateFor(v.frequency) ?? v.annual_interest_rate;
+
   const schedule = createSchedule({
     principal: v.principal,
-    annualRate: v.annual_interest_rate,
+    rate: effectiveRate,
     installments: v.installments_count,
     firstPayment: v.first_payment_at,
     frequency: v.frequency as Frequency,
@@ -189,7 +194,7 @@ export async function updateLoanAction(formData: FormData) {
       custom_days: v.custom_days ?? null,
       installments_count: v.installments_count,
       interest_type: v.interest_type,
-      annual_interest_rate: v.annual_interest_rate,
+      annual_interest_rate: effectiveRate,
       tolerance_days: v.tolerance_days,
       late_rule: v.late_rule,
       late_rate: v.late_rate,
