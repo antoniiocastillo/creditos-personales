@@ -101,14 +101,14 @@ export function PagareDocument({
           <Text style={styles.amountWords}>{moneyInWords(loan.total_due)}</Text>
         </View>
 
-        <Text style={styles.placeDate}>______________________, a {fmtDate(today)}</Text>
+        <Text style={styles.placeDate}>Delicias, Chihuahua, a {fmtDate(today)}</Text>
 
         <Text style={styles.paragraph}>
-          Debo y pagaré incondicionalmente a la orden de <Text style={styles.bold}>{companyName}</Text>, en esta ciudad o en el lugar que el
-          tenedor de este título me indique, la cantidad de <Text style={styles.bold}>{money(loan.total_due)}</Text> ({moneyInWords(loan.total_due)}),
-          valor que reconozco haber recibido a mi entera satisfacción en calidad de préstamo por {money(loan.principal)}, mismo que me
-          comprometo a liquidar mediante los pagos parciales que se detallan en el siguiente plan de pagos, sin que dichos abonos parciales
-          modifiquen el carácter único e indivisible de este pagaré.
+          Debo y pagaré incondicionalmente a la orden de <Text style={styles.bold}>{companyName}</Text> la cantidad de{' '}
+          <Text style={styles.bold}>{money(loan.total_due)}</Text> ({moneyInWords(loan.total_due)}), valor que reconozco haber recibido a mi
+          entera satisfacción en calidad de préstamo por {money(loan.principal)}, mismo que me comprometo a liquidar mediante los pagos
+          parciales que se detallan en el siguiente plan de pagos, sin que dichos abonos parciales modifiquen el carácter único e indivisible de
+          este pagaré.
         </Text>
 
         <Text style={styles.sectionTitle}>Plan de pagos</Text>
@@ -129,8 +129,8 @@ export function PagareDocument({
 
         <Text style={styles.paragraph}>
           En caso de no cubrir puntualmente cualquiera de las parcialidades señaladas, me obligo a pagar un interés moratorio equivalente a{' '}
-          {lateDescription[loan.late_rule] ?? `${loan.late_rate}`}, sin perjuicio del derecho del tenedor de este título a exigir el pago total
-          del saldo insoluto y de ejercer las acciones legales que en derecho correspondan.
+          {lateDescription[loan.late_rule] ?? `${loan.late_rate}`}, sin perjuicio del derecho de <Text style={styles.bold}>{companyName}</Text> a
+          exigir el pago total del saldo insoluto y de ejercer las acciones legales que en derecho correspondan.
         </Text>
 
         {loan.has_guarantee && (
