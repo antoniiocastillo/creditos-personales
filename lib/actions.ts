@@ -275,6 +275,7 @@ export async function registerPaymentAction(formData: FormData) {
   if (error) fail('/pagos', error.message);
   revalidatePath('/pagos');
   revalidatePath('/creditos');
+  revalidatePath(`/creditos/${v.loan_id}`);
   revalidatePath('/');
   redirect('/pagos');
 }
