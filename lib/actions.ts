@@ -89,6 +89,8 @@ const loanSchema = z.object({
   tolerance_days: z.coerce.number().int().min(0).default(3),
   late_rule: z.enum(['daily', 'per_overdue_period', 'percent_overdue_balance']),
   late_rate: z.coerce.number().min(0).default(0),
+  has_guarantee: z.preprocess((v) => v === 'on' || v === true, z.boolean()).optional().default(false),
+  guarantee_description: z.string().optional().or(z.literal('')),
 });
 
 export async function createLoanAction(formData: FormData) {
@@ -133,6 +135,8 @@ export async function createLoanAction(formData: FormData) {
       tolerance_days: v.tolerance_days,
       late_rule: v.late_rule,
       late_rate: v.late_rate,
+      has_guarantee: v.has_guarantee,
+      guarantee_description: v.has_guarantee ? v.guarantee_description || null : null,
       status: 'active',
       total_due: +totalDue.toFixed(2),
       outstanding_balance: v.principal,
@@ -198,6 +202,8 @@ export async function updateLoanAction(formData: FormData) {
       tolerance_days: v.tolerance_days,
       late_rule: v.late_rule,
       late_rate: v.late_rate,
+      has_guarantee: v.has_guarantee,
+      guarantee_description: v.has_guarantee ? v.guarantee_description || null : null,
       total_due: +totalDue.toFixed(2),
       outstanding_balance: v.principal,
     })

@@ -6,6 +6,7 @@ import { money } from '@/lib/money';
 import { projectLateFee } from '@/lib/lateFees';
 import { updateLoanAction, cancelLoanAction } from '@/lib/actions';
 import { FrequencyAndRateFields } from '@/components/frequency-rate-fields';
+import { GuaranteeField } from '@/components/guarantee-field';
 import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -53,7 +54,7 @@ export default async function CreditoDetalle({
     supabase
       .from('loans')
       .select(
-        'id,folio,client_id,principal,outstanding_balance,total_due,status,disbursed_at,first_payment_at,frequency,custom_days,installments_count,interest_type,annual_interest_rate,tolerance_days,late_rule,late_rate,clients(full_name,phone)',
+        'id,folio,client_id,principal,outstanding_balance,total_due,status,disbursed_at,first_payment_at,frequency,custom_days,installments_count,interest_type,annual_interest_rate,tolerance_days,late_rule,late_rate,has_guarantee,guarantee_description,clients(full_name,phone)',
       )
       .eq('id', params.id)
       .single(),
@@ -169,6 +170,7 @@ export default async function CreditoDetalle({
               </select>
             </label>
             <label className="field">Tasa de moratorio<input className="input" name="late_rate" type="number" step="0.01" defaultValue={Number(loan.late_rate)} /></label>
+            <GuaranteeField defaultChecked={loan.has_guarantee} defaultDescription={loan.guarantee_description ?? ''} />
             <p className="small span2">Al guardar se recalcula la tabla de amortización completa con estos nuevos datos.</p>
             <div className="span2"><button className="button" type="submit">Guardar cambios</button></div>
           </form>
@@ -186,6 +188,13 @@ export default async function CreditoDetalle({
           <div><div className="stat-value">{loanStatusLabel[loan.status] ?? loan.status}</div><div className="stat-label">Estado</div></div>
         </div>
       </div>
+
+      {loan.has_guarantee && (
+        <div className="card" style={{ marginBottom: 20 }}>
+          <div className="kpi-label" style={{ marginBottom: 4 }}>Garantía</div>
+          <p style={{ margin: 0 }}>{loan.guarantee_description || 'Se marcó que dejó garantía, sin descripción capturada.'}</p>
+        </div>
+      )}
 
       <div className="card" style={{ marginBottom: 20 }}>
         <h2>Proyectar moratorios a una fecha</h2>

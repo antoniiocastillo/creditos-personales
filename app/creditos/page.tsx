@@ -6,6 +6,7 @@ import { createLoanAction } from '@/lib/actions';
 import { money } from '@/lib/money';
 import { IconLoans, IconCheck, IconAlert, IconInbox } from '@/components/icons';
 import { FrequencyAndRateFields } from '@/components/frequency-rate-fields';
+import { GuaranteeField } from '@/components/guarantee-field';
 
 const statusLabel: Record<string, string> = {
   draft: 'Borrador',
@@ -91,6 +92,7 @@ export default async function Creditos({ searchParams }: { searchParams: { nuevo
               </select>
             </label>
             <label className="field">Tasa de moratorio<input className="input" name="late_rate" type="number" step="0.01" defaultValue={0} /></label>
+            <GuaranteeField />
             <div className="span2"><button className="button" type="submit">Otorgar crédito</button></div>
           </form>
         </div>

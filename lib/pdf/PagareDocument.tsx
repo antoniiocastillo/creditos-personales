@@ -69,7 +69,16 @@ export function PagareDocument({
   companyName: string;
   today: string;
   client: { full_name: string; identification?: string | null; address?: string | null };
-  loan: { folio: string; principal: number; total_due: number; disbursed_at: string; late_rule: string; late_rate: number };
+  loan: {
+    folio: string;
+    principal: number;
+    total_due: number;
+    disbursed_at: string;
+    late_rule: string;
+    late_rate: number;
+    has_guarantee: boolean;
+    guarantee_description: string | null;
+  };
   installments: PagareInstallment[];
 }) {
   const fmtDate = (d: string) => new Date(d + 'T12:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -123,6 +132,13 @@ export function PagareDocument({
           {lateDescription[loan.late_rule] ?? `${loan.late_rate}`}, sin perjuicio del derecho del tenedor de este título a exigir el pago total
           del saldo insoluto y de ejercer las acciones legales que en derecho correspondan.
         </Text>
+
+        {loan.has_guarantee && (
+          <Text style={styles.paragraph}>
+            Como garantía del cumplimiento de esta obligación, dejo en garantía lo siguiente: <Text style={styles.bold}>{loan.guarantee_description || 'sin especificar'}</Text>,
+            mismo que quedará en poder del acreedor hasta la total liquidación de este pagaré.
+          </Text>
+        )}
 
         <Text style={styles.legal}>
           Este documento es un pagaré en los términos de los artículos 170 y 174 de la Ley General de Títulos y Operaciones de Crédito. Lugar

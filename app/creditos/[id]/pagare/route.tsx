@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
   const [{ data: loan }, { data: installments }, { data: settings }] = await Promise.all([
     supabase
       .from('loans')
-      .select('folio,principal,total_due,disbursed_at,late_rule,late_rate,clients(full_name,identification,address)')
+      .select('folio,principal,total_due,disbursed_at,late_rule,late_rate,has_guarantee,guarantee_description,clients(full_name,identification,address)')
       .eq('id', params.id)
       .single(),
     supabase
@@ -39,6 +39,8 @@ export async function GET(_request: Request, { params }: { params: { id: string 
         disbursed_at: loan.disbursed_at,
         late_rule: loan.late_rule,
         late_rate: Number(loan.late_rate),
+        has_guarantee: loan.has_guarantee,
+        guarantee_description: loan.guarantee_description,
       }}
       installments={(installments ?? []).map((i: any) => ({
         sequence_no: i.sequence_no,

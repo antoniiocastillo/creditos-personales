@@ -406,6 +406,9 @@ a.button { display: inline-flex; align-items: center; }
 }
 .field textarea { min-height: 80px; resize: vertical; }
 
+.checkbox-field { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--ink-soft); font-size: 13px; }
+.checkbox-field input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
 .payment-info {
   background: var(--accent-soft);
   border-radius: 8px;
