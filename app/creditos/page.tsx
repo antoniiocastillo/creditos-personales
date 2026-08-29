@@ -77,6 +77,9 @@ export default async function Creditos({ searchParams }: { searchParams: { nuevo
             <FrequencyAndRateFields />
             <label className="field">Días personalizados<input className="input" name="custom_days" type="number" min="1" /></label>
             <label className="field"># de parcialidades<input className="input" name="installments_count" type="number" min="1" required /></label>
+            <p className="small span2" style={{ marginTop: -8 }}>
+              Cada parcialidad cobra solo el interés fijo; el capital no se abona hasta la última, donde se liquida el capital completo más el interés de ese periodo.
+            </p>
             <label className="field">Días de tolerancia<input className="input" name="tolerance_days" type="number" defaultValue={3} /></label>
             <label className="field">Regla de moratorios
               <select name="late_rule">
