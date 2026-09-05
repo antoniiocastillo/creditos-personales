@@ -5,10 +5,9 @@ import { registerPaymentAction } from '@/lib/actions';
 import { money } from '@/lib/money';
 import { IconPayments, IconCheck, IconInbox, IconLoans } from '@/components/icons';
 import { PaymentLoanPicker, type LoanOption } from '@/components/payment-loan-picker';
+import { methodLabel } from '@/lib/labels';
 
 export const dynamic = 'force-dynamic';
-
-const methodLabel: Record<string, string> = { cash: 'Efectivo', transfer: 'Transferencia', card: 'Tarjeta', other: 'Otro' };
 
 export default async function Pagos({ searchParams }: { searchParams: { nuevo?: string; error?: string } }) {
   const supabase = createClient();

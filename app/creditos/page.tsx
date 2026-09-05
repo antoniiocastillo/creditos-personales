@@ -7,23 +7,9 @@ import { money } from '@/lib/money';
 import { IconLoans, IconCheck, IconAlert, IconInbox } from '@/components/icons';
 import { FrequencyAndRateFields } from '@/components/frequency-rate-fields';
 import { GuaranteeField } from '@/components/guarantee-field';
+import { loanStatusLabel as statusLabel, loanStatusBadge as statusBadge } from '@/lib/labels';
 
-const statusLabel: Record<string, string> = {
-  draft: 'Borrador',
-  active: 'Activo',
-  paid_off: 'Liquidado',
-  cancelled: 'Cancelado',
-  restructured: 'Reestructurado',
-};
 export const dynamic = 'force-dynamic';
-
-const statusBadge: Record<string, string> = {
-  draft: 'pending',
-  active: 'paid',
-  paid_off: 'paid',
-  cancelled: 'late',
-  restructured: 'pending',
-};
 
 export default async function Creditos({ searchParams }: { searchParams: { nuevo?: string; error?: string } }) {
   const supabase = createClient();

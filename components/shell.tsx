@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { signOut } from '@/lib/actions';
 import { createClient } from '@/lib/supabase/server';
 import { NotificationsBell, type OverdueItem } from '@/components/notifications-bell';
+import { RealtimeRefresher } from '@/components/realtime-refresher';
 import { IconDashboard, IconClients, IconLoans, IconPayments, IconReports, IconAdmin, IconLogout } from '@/components/icons';
 
 const links = [
@@ -64,6 +65,7 @@ export function Shell({
 
   return (
     <div className="shell">
+      <RealtimeRefresher />
       <aside className="side">
         <div className="brand">
           <span className="logo">C</span>

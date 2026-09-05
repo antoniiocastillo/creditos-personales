@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { methodLabel, loanStatusLabel } from '@/lib/labels';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
       .order('paid_at', { ascending: false });
     rows = [['Fecha', 'Folio', 'Cliente', 'Monto', 'Método']];
     (data ?? []).forEach((p: any) => {
-      rows.push([p.paid_at, p.loans?.folio ?? '', p.clients?.full_name ?? '', Number(p.amount).toFixed(2), p.method]);
+      rows.push([p.paid_at, p.loans?.folio ?? '', p.clients?.full_name ?? '', Number(p.amount).toFixed(2), methodLabel[p.method] ?? p.method]);
     });
   } else {
     filename = 'estado-de-cuenta-por-cliente.csv';
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest) {
         rows.push([c.full_name, c.phone, '', '', '', '']);
       }
       (c.loans ?? []).forEach((l: any) => {
-        rows.push([c.full_name, c.phone, l.folio, Number(l.principal).toFixed(2), Number(l.outstanding_balance).toFixed(2), l.status]);
+        rows.push([c.full_name, c.phone, l.folio, Number(l.principal).toFixed(2), Number(l.outstanding_balance).toFixed(2), loanStatusLabel[l.status] ?? l.status]);
       });
     });
   }

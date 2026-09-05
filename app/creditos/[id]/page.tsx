@@ -8,28 +8,10 @@ import { updateLoanAction, cancelLoanAction } from '@/lib/actions';
 import { FrequencyAndRateFields } from '@/components/frequency-rate-fields';
 import { GuaranteeField } from '@/components/guarantee-field';
 import { notFound } from 'next/navigation';
+import { lateRuleLabel, loanStatusLabel, installmentStatusLabel as statusLabel } from '@/lib/labels';
 
 export const dynamic = 'force-dynamic';
 
-const lateRuleLabel: Record<string, string> = {
-  daily: 'Por día de atraso',
-  per_overdue_period: 'Por periodo vencido',
-  percent_overdue_balance: '% sobre saldo vencido',
-};
-const loanStatusLabel: Record<string, string> = {
-  draft: 'Borrador',
-  active: 'Activo',
-  paid_off: 'Liquidado',
-  cancelled: 'Cancelado',
-  restructured: 'Reestructurado',
-};
-const statusLabel: Record<string, string> = {
-  pending: 'Pendiente',
-  paid: 'Pagada',
-  partial: 'Parcial',
-  overdue: 'Vencida',
-  restructured: 'Reestructurada',
-};
 const statusBadge: Record<string, string> = {
   pending: 'pending',
   paid: 'paid',
