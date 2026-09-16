@@ -54,6 +54,15 @@ export default async function CreditoDetalle({
   const hasBalance = Number(loan.outstanding_balance) > 0;
   const canEdit = (paymentsCount ?? 0) === 0 && (loan.status === 'active' || loan.status === 'draft');
 
+  const installmentIds = (installments ?? []).map((i: any) => i.id);
+  const { data: lateAllocations } = installmentIds.length
+    ? await supabase.from('payment_allocations').select('installment_id,late_amount').in('installment_id', installmentIds)
+    : { data: [] as { installment_id: string; late_amount: number }[] };
+  const paidLateByInstallment: Record<string, number> = {};
+  (lateAllocations ?? []).forEach((a: any) => {
+    paidLateByInstallment[a.installment_id] = (paidLateByInstallment[a.installment_id] ?? 0) + Number(a.late_amount);
+  });
+
   const rows = (installments ?? []).map((i: any) => {
     const settled = i.status === 'paid' || i.status === 'restructured';
     const projection = settled
@@ -68,6 +77,7 @@ export default async function CreditoDetalle({
           ordinaryInterestDue: Number(i.ordinary_interest_due),
           paidAmount: Number(i.paid_amount),
           currentLateInterestDue: Number(i.late_interest_due),
+          paidLate: paidLateByInstallment[i.id] ?? 0,
         });
     const balanceAtDate = settled
       ? 0
