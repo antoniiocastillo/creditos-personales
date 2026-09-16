@@ -283,13 +283,7 @@ export async function registerPaymentAction(formData: FormData) {
 // --- Administración ---
 
 const settingsSchema = z.object({
-  currency: z.string().min(1),
-  default_annual_rate: z.coerce.number().min(0),
-  default_late_rule: z.enum(['daily', 'per_overdue_period', 'percent_overdue_balance']),
-  default_late_rate: z.coerce.number().min(0),
-  tolerance_days: z.coerce.number().int().min(0),
   company_name: z.string().optional().or(z.literal('')),
-  receipt_footer: z.string().optional().or(z.literal('')),
 });
 
 export async function updateSettingsAction(formData: FormData) {
@@ -301,15 +295,7 @@ export async function updateSettingsAction(formData: FormData) {
   const supabase = createClient();
   const { error } = await supabase
     .from('system_settings')
-    .update({
-      currency: v.currency,
-      default_annual_rate: v.default_annual_rate,
-      default_late_rule: v.default_late_rule,
-      default_late_rate: v.default_late_rate,
-      tolerance_days: v.tolerance_days,
-      company_name: v.company_name || null,
-      receipt_footer: v.receipt_footer || null,
-    })
+    .update({ company_name: v.company_name || null })
     .eq('id', true);
   if (error) fail('/administracion', error.message);
   revalidatePath('/administracion');
