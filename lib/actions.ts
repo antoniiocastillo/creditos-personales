@@ -20,8 +20,17 @@ export async function signIn(formData: FormData) {
   const email = String(formData.get('email') || '');
   const password = String(formData.get('password') || '');
   const supabase = createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) fail('/login', 'Correo o contraseña incorrectos');
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    fail('/login', /banned/i.test(error.message) ? 'Tu usuario está desactivado. Contacta al administrador.' : 'Correo o contraseña incorrectos');
+  }
+  // Segunda barrera por si el ban de Auth no estuviera aplicado: un usuario
+  // inactivo no puede leer ni su propio perfil (RLS can_access()).
+  const { data: userProfile } = await supabase.from('profiles').select('active').eq('id', data!.user.id).maybeSingle();
+  if (!userProfile?.active) {
+    await supabase.auth.signOut();
+    fail('/login', 'Tu usuario está desactivado. Contacta al administrador.');
+  }
   redirect('/');
 }
 
@@ -338,8 +347,21 @@ export async function toggleUserActive(formData: FormData) {
   if (profile?.role !== 'admin') fail('/administracion', 'Solo un administrador puede cambiar usuarios');
   const id = String(formData.get('id'));
   const active = formData.get('active') === 'true';
+  if (active && id === profile.id) fail('/administracion', 'No puedes desactivar tu propio usuario');
+
   const supabase = createClient();
-  await supabase.from('profiles').update({ active: !active }).eq('id', id);
+  const { error: profileError } = await supabase.from('profiles').update({ active: !active }).eq('id', id);
+  if (profileError) fail('/administracion', profileError.message);
+
+  // profiles.active solo lo leen las politicas RLS; Supabase Auth no lo conoce.
+  // Sin el ban, el usuario desactivado sigue pudiendo iniciar sesion y conserva
+  // sus sesiones abiertas. active=true -> quitar ban; active=false -> banear.
+  const admin = createAdminClient();
+  const { error: banError } = await admin.auth.admin.updateUserById(id, { ban_duration: active ? '876000h' : 'none' });
+  if (banError) {
+    await supabase.from('profiles').update({ active }).eq('id', id);
+    fail('/administracion', 'No se pudo cambiar el acceso del usuario: ' + banError.message);
+  }
   revalidatePath('/administracion');
 }
 
